@@ -302,6 +302,8 @@
 - 当前 Android 输出为 `app-debug.apk`，包名 `com.codex.quota.android`、版本 `0.6.0 / 600`，大小 46,935,400 bytes，SHA-256 `81F561E224BA2BD2173F95C58055315CBBCA29FF81C4B482467181B25E8C5119`；需重新用 Band 8-only 参数跑测试/构建后再作为预发布资产。
 - 已整理预发布资产：`CodexQuota-0.6.0-Windows-x64-portable.zip`（包含 `CodexQuota.exe` 与 `libunwind.dll`，SHA-256 `1339CE5126DB7E358C737226D65135B0268E541862BE18159544F50274D4376A`）、`CodexQuota-0.6.0-band8-nfc-debug.apk`（SHA-256 `81F561E...C5119`）和 `SHA256SUMS.txt`；ZIP 内容已核对。
 - 发布说明必须明确这是 `v0.6.0-band8-nfc-preview` 预发布：Windows 是便携 ZIP（非 NSIS 安装器），Android 是 Band 8-only debug-signed APK；不提供 Band 10 RPK 或标准签名 APK。
+- GitHub Release 已创建：tag `v0.6.0-band8-nfc-preview`，Release id `363593611`，状态为 `prerelease=true`、`draft=false`，目标为 `main`。
+- 三个资产均已上传并返回 `state=uploaded`：Windows ZIP 2,904,800 bytes、Band 8-only APK 46,935,400 bytes、`SHA256SUMS.txt` 433 bytes；远端下载 URL 已取得。
 - 一次提交前复核命令误用 PowerShell 7 的 `||` 语法，当前 PowerShell 解析失败且未执行任何检查；改用兼容 PowerShell 5 的分步命令。
 - Git credential helper 使用 Windows Credential Manager；系统没有 `gh`，可在受控网络权限下通过 GitHub REST API 使用已配置的 Git 凭据创建 Release，令牌不得输出到日志。
 - 在 escalated 用户上下文中直接从仓库工作目录读取 tag 触发 dubious ownership；从父目录调用 `origin` 又因没有仓库配置失败；最终改用远端 HTTPS URL 直接查询，确认没有现存 `v0.6.0*` tag。

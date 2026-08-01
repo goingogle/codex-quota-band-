@@ -155,5 +155,6 @@
 - 直接 Gradle 运行超过 5 分钟无输出，已终止；现有 APK 时间戳未变化，继续使用先前已验证的 Band 8-only debug 产物并在 Release 中明确其调试签名性质。
 - Windows portable ZIP、Band 8-only debug APK 和 SHA256SUMS 已整理到工作区 `release-assets/v0.6.0-band8-nfc-preview/`，ZIP 内含运行所需 `libunwind.dll`。
 - 已确定 Release 采用 `v0.6.0-band8-nfc-preview` 预发布标签，上传 Windows portable ZIP、Band 8-only debug APK 和 SHA256SUMS，不上传 Band 10 RPK/标准 release APK。
+- GitHub Release 已创建并上传三个资产；API 核对 `prerelease=True`、`draft=False`，三个资产均为 `uploaded`。
 - 远端 tag 检查完成：没有现存 `v0.6.0*` 标签；检查过程中遇到 escalated 工作目录 ownership 提示，已改用远端 HTTPS URL 查询。
 - 提交前复核脚本因 PowerShell 5 不支持 `||` 而未执行；已记录并改为兼容语法重跑。

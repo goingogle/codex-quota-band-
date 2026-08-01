@@ -12,9 +12,8 @@
 | 安卓手机（Band 8-only） | 先前 Band 8-only 单测 107/107、Lint、Debug assemble | `CodexQuota-0.6.0-band8-nfc-debug.apk`（46,935,400 bytes） | `81F561E224BA2BD2173F95C58055315CBBCA29FF81C4B482467181B25E8C5119` |
 | 根目录契约 | Node 测试 46/46 | — | — |
 
-安卓 APK 使用固定发布签名；签名材料和小米 Wearable SDK 二进制均不随仓库分发。
-
-本次 APK 是 Debug 签名，因此上表的“固定发布签名”不适用于该预发布；它只用于 Band 8 NFC 当前验收。ZIP 内的
+标准 Android release APK 使用固定发布签名；签名材料和小米 Wearable SDK 二进制均不随仓库分发。本次预发布 APK 是
+Debug 签名，仅用于 Band 8 NFC 当前验收。ZIP 内的
 `CodexQuota.exe` SHA-256 为 `63C0FB203E9D1BF2FC0105DE42253904056293DD8990443CCC03663E88E4BD90`，
 `libunwind.dll` SHA-256 为 `13BF4E99B0193634EBDEB0BBDEFF9753B39F1D04799183F664111014AABF4C2C`。
 
