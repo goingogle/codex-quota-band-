@@ -9,6 +9,57 @@ import org.junit.Test
 
 class UiModelsTest {
   @Test
+  fun `band 8 notification compatibility is opt in`() {
+    assertEquals(false, NotificationSettings.Default.band8NotificationCompatibility)
+  }
+
+  @Test
+  fun `band 8 build reports notification forwarding instead of a direct connection`() {
+    assertEquals(
+      BandStatusPresentation(
+        label = "手环 8 通知",
+        status = "转发已启用",
+        linkState = DeviceLinkState.Connected,
+      ),
+      bandStatusPresentation(
+        band8Only = true,
+        band8NotificationCompatibility = true,
+        directLinkState = DeviceLinkState.Disconnected,
+      ),
+    )
+    assertEquals(
+      BandStatusPresentation(
+        label = "手环 8 通知",
+        status = "转发未启用",
+        linkState = DeviceLinkState.Disconnected,
+      ),
+      bandStatusPresentation(
+        band8Only = true,
+        band8NotificationCompatibility = false,
+        directLinkState = DeviceLinkState.Connected,
+      ),
+    )
+  }
+
+  @Test
+  fun `standard build keeps wearable SDK connection wording`() {
+    assertEquals(
+      BandStatusPresentation(
+        label = "手环",
+        status = "已连接",
+        linkState = DeviceLinkState.Connected,
+      ),
+      bandStatusPresentation(
+        band8Only = false,
+        band8NotificationCompatibility = true,
+        directLinkState = DeviceLinkState.Connected,
+      ),
+    )
+    assertEquals(true, showBand10Controls(band8Only = false))
+    assertEquals(false, showBand10Controls(band8Only = true))
+  }
+
+  @Test
   fun `only authorization uses attention text in the current task contract`() {
     assertEquals(TaskStatusEmphasis.Default, taskStatusEmphasis(TaskState.Running))
     assertEquals(TaskStatusEmphasis.Attention, taskStatusEmphasis(TaskState.NeedsAuthorization))

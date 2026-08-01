@@ -35,6 +35,13 @@ object NotificationChannels {
         importance = ChannelImportance.High,
         vibrate = false,
       ),
+      NotificationChannelSpec(
+        id = BAND8_QUOTA_STATUS_CHANNEL_ID,
+        name = "手环 8 配额状态",
+        description = "通过小米运动健康把配额摘要同步到手环通知列表",
+        importance = ChannelImportance.Default,
+        vibrate = false,
+      ),
     )
 
   fun create(context: Context) {
@@ -59,6 +66,7 @@ object NotificationChannels {
 
   const val NEEDS_AUTHORIZATION_CHANNEL_ID = "needs-authorization-v2"
   const val WAITING_FOR_REVIEW_CHANNEL_ID = "waiting-for-review-v2"
+  const val BAND8_QUOTA_STATUS_CHANNEL_ID = "band8-quota-status-v2"
 
   private val LEGACY_CHANNEL_IDS =
     listOf(
@@ -66,5 +74,6 @@ object NotificationChannels {
       "waiting-for-review",
       "needs-authorization-v3",
       "waiting-for-review-v3",
+      "band8-quota-status-v1",
     )
 }

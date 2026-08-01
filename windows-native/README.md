@@ -8,6 +8,7 @@
   `running`、`needs_authorization` 和 `waiting_for_review`。
 - 安装器会自动写入或修复任务 Hook；托盘也提供「安装/修复任务 Hook」，始终以不覆盖其他用户 Hook 的方式合并到用户配置。
 - 托盘使用项目自己的高对比 Codex 图标，不使用 Windows 系统信息提示图标。
+- 托盘和“连接与诊断”窗口把手机状态拆成“未配对”“已配对 · 离线”“已配对 · 在线”；支持用 `--show-diagnostics` 直接打开同一个诊断窗口，便于本机排障与验收。
 - Hook 写入后，建议重启 ChatGPT 桌面端；在「ChatGPT → 设置 → 钩子 → 信任全部钩子」中确认 `PreToolUse`、`PermissionRequest`、`UserPromptSubmit` 和 `Stop`。`/hooks` 仅用于备用排障。
 - 使用 `session_id` 将后续轮次归并到同一任务。
 - 配对窗口只展示二维码和有效期；二维码内部仍包含一次性验证码，Android 扫码后自动提交，用户不需要手动输入验证码或局域网地址。

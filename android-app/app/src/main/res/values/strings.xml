@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="pairing_scanner_permission_required">需要相机权限才能扫描电脑上的二维码</string>
+  <string name="pairing_scanner_instruction">将电脑上的配对二维码放入画面</string>
+  <string name="pairing_scanner_cancel">取消</string>
+  <string name="pairing_scanner_wrong_code">这不是 Codex额度 的配对码，请扫描电脑窗口中的二维码</string>
+  <string name="pairing_scanner_camera_error">无法启动扫码相机，请检查相机权限</string>
+</resources>

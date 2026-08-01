@@ -6,15 +6,16 @@
 
 ## 1. 项目定位与当前版本
 
-CodexQuota 是一个 Android + Windows + 小米手环 10 的本地额度和任务状态看板：
+CodexQuota 是一个 Android + Windows + 小米手环的本地额度和任务状态看板：
 
-`ChatGPT Windows Hook → Windows 原生托盘程序 → 局域网加密同步 → Android Codex额度 → 小米运动健康/Wearable SDK → 手环 RPK`
+`ChatGPT Windows Hook → Windows 原生托盘程序 → 局域网加密同步 → Android Codex额度 → 小米运动健康 → 手环`
 
 - 当前开发版本：`0.6.0 / versionCode 600`，三端本地候选已生成并通过自动验证与真机验收；仍未提交、推送或发布。
+- 上述验收只覆盖小米手环 10。当前工作区另有手环 8 NFC 通知兼容源码，走 Android 系统通知镜像，不使用 RPK，且尚待 Android 构建和真机验收。
 - 三端当前验收状态、临时版本差异和未决冲突以 `docs/current-status.md` 为唯一摘要；不要从单端
   构建记录推断三端已经一致。
 - 新架构只面向 Android；不为 iPhone 增加兼容层，也不把旧 AstroBox 桥接重新放回日常链路。
-- AstroBox 只在首次安装或升级手环 RPK 时临时使用；日常手环连接、健康同步和普通手机通知由小米运动健康保持。
+- AstroBox 只在首次安装或升级手环 10 RPK 时临时使用；手环 8 NFC 不使用 AstroBox。日常手环连接、健康同步和普通手机通知由小米运动健康保持。
 - Windows、Android APK、手环 RPK 的产品版本号必须一致；协议兼容性由协议版本判断，不能只看产品版本。
 
 完整产品决策以 `CONTEXT.md` 为准；若新需求与其冲突，先向用户确认，不要自行扩大范围。
@@ -26,7 +27,7 @@ CodexQuota 是一个 Android + Windows + 小米手环 10 的本地额度和任�
 - 任务状态只来自已验证的官方 Hook：`PreToolUse/UserPromptSubmit → 处理中`、
   `PermissionRequest → 需要授权`、`Stop → 等待查看`。不要把“等待查看”改写成“已完成”。
 - Android 任务移除是本机任务板隐藏，不删除 ChatGPT 对话；任务出现新活动后允许自动恢复。
-- 默认通知时机是“仅在 ChatGPT 失焦时”；处理中静默，等待查看和需要授权可提醒；手机和手环开关独立。
+- 默认通知时机是“仅在 ChatGPT 失焦时”；处理中静默，等待查看和需要授权可提醒；手机、手环 10 应用提醒和默认关闭的手环 8 NFC 通知兼容开关相互独立。
 - 不承诺 Android 被系统杀死后通知必达，不新增常驻前台服务或状态栏通知来掩盖后台限制。
 - 默认只在可信局域网运行，不新增云端中转、公网暴露、遥测、广告或自动崩溃上报。
 - 不把缓存冒充实时数据，不猜测缺失的额度、重置次数或重置后的百分比。
@@ -37,7 +38,7 @@ CodexQuota 是一个 Android + Windows + 小米手环 10 的本地额度和任�
 | --- | --- | --- |
 | `windows-native/` | Windows 托盘、Hook、额度采集、配对、TLS 1.3 WSS `/pair`/`/sync` | Rust 2024、Tokio、Rustls、Windows API |
 | `android-app/` | 手机看板、配对客户端、WSS 重连、通知决策、手环桥接 | Kotlin、Jetpack Compose、Android SDK、Xiaomi Wearable SDK |
-| `band-app/` | 小米手环 10 快应用和 212×520 页面 | Vela/AIoT UX、JavaScript |
+| `band-app/` | 小米手环 10 快应用和 212×520 页面；不用于手环 8 NFC | Vela/AIoT UX、JavaScript |
 | `contract/` | 配对、额度、任务、同步流 JSON 契约 | JSON Schema |
 | `docs/` | 架构、ADR、安全、构建和真机验收证据 | Markdown |
 | `src/`、`astrobox-plugin/` | 0.4.0 以前的 Electron/AstroBox 历史实现 | legacy，只作回溯，不进入新架构主流程 |
@@ -53,7 +54,7 @@ Android 运行时的主要入口是 `CodexQuotaApplication`、`SyncWebSocketClie
 1. 在仓库根目录执行 `git status --short`，保留所有用户已有的修改和未跟踪文件。
 2. 阅读 `README.md`、`CHANGELOG.md`；涉及安全、构建或设备时补读对应文档。
 3. 先定位现有实现和测试，再决定最小修改范围。不要为“看起来更规范”顺手重写无关模块。
-4. 涉及手环 UI 时，先给用户看 212×520 预览；只有用户确认后才能改 RPK 源码和正式构建。
+4. 涉及手环 RPK 或 Android UI 时，先提供对应预览；只有用户确认后才能修改正式 UI 源码。纯通知文案/策略不伪装成手环页面。
 5. 先写/补测试，再实现；变更完成后运行与变更直接相关的自动测试，并说明真机仍需验证的部分。
 6. 交付时说明改动、测试、真机状态、产物和 Git/发布状态。用户明确说“验收通过”之前不得提交、推送、创建 Release 或上传构建产物。
 
@@ -101,7 +102,7 @@ npm run build
 ## 6. 真机验收和发布规则
 
 - 自动测试不能代替 Windows、Android、手环三端真机验收。
-- 重点验收：首次二维码配对、Hook 事件和任务标题、失焦通知、锁屏/后台连接、手环提醒、离线缓存、重连、任务本机移除、RPK 页面可读性。
+- 重点验收：首次二维码配对、Hook 事件和任务标题、失焦通知、锁屏/后台连接、手环提醒、离线缓存、重连、任务本机移除、手环 10 RPK 页面可读性；手环 8 NFC 另按 `docs/device-acceptance.md` 验证通知白名单、配额去重和原生通知列表。
 - 用户已配置应用加锁、自启动和电池无限制；测试应使用短时、可重复的场景，不擅自安排长时间测试。
 - 预发布包留在本地；只有用户明确回复“验收通过”后，才可以进入提交、推送和 GitHub Release 流程。
 

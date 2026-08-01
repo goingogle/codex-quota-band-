@@ -105,6 +105,14 @@ impl AppController {
             .unwrap_or(0)
     }
 
+    fn phone_paired(&self) -> bool {
+        let Ok(host) = self.host.lock() else {
+            return false;
+        };
+        host.as_ref()
+            .is_some_and(|host| self.runtime.block_on(host.phone_paired()))
+    }
+
     fn upstream_freshness(&self) -> UpstreamFreshness {
         self.quota_state
             .read()
@@ -249,12 +257,15 @@ fn main() {
     let show_onboarding = arguments
         .iter()
         .any(|argument| argument == "--show-onboarding");
-    if let Err(error) = run(show_onboarding) {
+    let show_diagnostics = arguments
+        .iter()
+        .any(|argument| argument == "--show-diagnostics");
+    if let Err(error) = run(show_onboarding, show_diagnostics) {
         show_message("Codex额度无法启动", &error, MB_ICONERROR);
     }
 }
 
-fn run(show_onboarding: bool) -> Result<(), String> {
+fn run(show_onboarding: bool, show_diagnostics: bool) -> Result<(), String> {
     let mutex_name = wide("Local\\CodexQuotaWindowsNative040");
     // CreateMutexW signals an existing instance through LastError. Clear any
     // unrelated thread error first so a clean launch cannot be mistaken for a
@@ -322,6 +333,9 @@ fn run(show_onboarding: bool) -> Result<(), String> {
         let tray_icon = add_tray_icon(window)?;
         if show_onboarding {
             show_pairing_from_app();
+        }
+        if show_diagnostics {
+            show_diagnostics_window();
         }
         if cfg!(debug_assertions) && std::env::args().any(|argument| argument == "--show-pairing") {
             if let Some(app) = APP.get() {
@@ -522,6 +536,7 @@ unsafe fn show_tray_menu(window: HWND) {
         return;
     }
     let connections = APP.get().map(|app| app.active_connections()).unwrap_or(0);
+    let phone_paired = APP.get().is_some_and(|app| app.phone_paired());
     let upstream = APP
         .get()
         .map(|app| app.upstream_freshness())
@@ -536,11 +551,7 @@ unsafe fn show_tray_menu(window: HWND) {
         menu,
         MF_STRING | MF_DISABLED,
         0,
-        if connections > 0 {
-            "手机 已连接"
-        } else {
-            "手机 未连接"
-        },
+        tray_phone_status_label(phone_paired, connections),
     );
     append_menu(
         menu,
@@ -1486,11 +1497,23 @@ unsafe fn draw_diag_item(dc: HDC, parent: RECT, title: &str, detail: &str, color
     );
 }
 
-fn phone_connection_label(active_connections: usize) -> &'static str {
-    if active_connections > 0 {
-        "已连接"
+fn phone_connection_label(phone_paired: bool, active_connections: usize) -> &'static str {
+    if !phone_paired {
+        "未配对"
+    } else if active_connections > 0 {
+        "已配对 · 在线"
     } else {
-        "未连接"
+        "已配对 · 离线"
+    }
+}
+
+fn tray_phone_status_label(phone_paired: bool, active_connections: usize) -> &'static str {
+    if !phone_paired {
+        "手机 未配对"
+    } else if active_connections > 0 {
+        "手机 已配对 · 在线"
+    } else {
+        "手机 已配对 · 离线"
     }
 }
 
@@ -1611,6 +1634,7 @@ unsafe fn paint_diagnostics_window(window: HWND) {
     let panel = diagnostics_panel_rect(client);
     draw_surface(dc, panel, UI_SURFACE, UI_BORDER, PAIRING_SURFACE_RADIUS);
     let connections = APP.get().map(|app| app.active_connections()).unwrap_or(0);
+    let phone_paired = APP.get().is_some_and(|app| app.phone_paired());
     let upstream = APP
         .get()
         .map(|app| app.upstream_freshness())
@@ -1625,7 +1649,7 @@ unsafe fn paint_diagnostics_window(window: HWND) {
         dc,
         panel,
         "Android 手机",
-        phone_connection_label(connections),
+        phone_connection_label(phone_paired, connections),
         if connections > 0 {
             UI_WAITING
         } else {
@@ -2591,8 +2615,12 @@ mod ui_contract_tests {
 
     #[test]
     fn diagnostics_reports_observable_phone_and_upstream_states() {
-        assert_eq!(phone_connection_label(0), "未连接");
-        assert_eq!(phone_connection_label(1), "已连接");
+        assert_eq!(phone_connection_label(false, 0), "未配对");
+        assert_eq!(phone_connection_label(true, 0), "已配对 · 离线");
+        assert_eq!(phone_connection_label(true, 1), "已配对 · 在线");
+        assert_eq!(tray_phone_status_label(false, 0), "手机 未配对");
+        assert_eq!(tray_phone_status_label(true, 0), "手机 已配对 · 离线");
+        assert_eq!(tray_phone_status_label(true, 1), "手机 已配对 · 在线");
         let mut freshness = UpstreamFreshness::default();
         assert_eq!(upstream_usage_label(&freshness, false).0, "待同步");
         freshness.usage.status = UpstreamFreshnessStatus::Cached;

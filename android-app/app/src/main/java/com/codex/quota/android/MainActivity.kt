@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
-import android.provider.MediaStore
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
@@ -23,6 +22,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import com.codex.quota.android.diagnostics.DiagnosticReport
+import com.codex.quota.android.notifications.Band8NotificationResult
 import com.codex.quota.android.permissions.shouldRequestNotificationPermission
 import com.codex.quota.android.ui.AppUiState
 import com.codex.quota.android.ui.CodexQuotaApp
@@ -56,6 +56,13 @@ class MainActivity : ComponentActivity() {
   }
   private val notificationPermissionLauncher =
     registerForActivityResult(ActivityResultContracts.RequestPermission()) {}
+  private val pairingQrScannerLauncher =
+    registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+      if (result.resultCode != RESULT_OK) return@registerForActivityResult
+      val pairingLink = result.data?.data ?: return@registerForActivityResult
+      (application as CodexQuotaApplication).handlePairingLink(pairingLink)
+      Toast.makeText(this, "已读取配对码，正在连接电脑", Toast.LENGTH_SHORT).show()
+    }
   private var pendingDiagnosticJson: String? = null
   private val diagnosticExportLauncher =
     registerForActivityResult(ActivityResultContracts.CreateDocument("application/json")) { uri ->
@@ -94,6 +101,7 @@ class MainActivity : ComponentActivity() {
       var notificationSettings by remember { mutableStateOf(settingsStore.load()) }
       CodexQuotaApp(
         state = displayState,
+        band8Only = BuildConfig.BAND8_ONLY,
         appVersion = appVersion,
         availableUpdate = availableUpdate,
         notificationSettings = notificationSettings,
@@ -103,6 +111,15 @@ class MainActivity : ComponentActivity() {
           quotaApplication.updateNotificationSettings(updatedSettings)
         },
         onOpenNotificationSettings = ::openNotificationSettings,
+        onPushQuotaToBand8 = {
+          val message =
+            when (quotaApplication.pushQuotaToBand8()) {
+              Band8NotificationResult.Published -> "配额已发送，请在手环通知中查看"
+              Band8NotificationResult.PermissionRequired -> "请先允许 Codex额度 发送系统通知"
+              Band8NotificationResult.NotificationsDisabled -> "请先在系统设置中开启 Codex额度 通知"
+            }
+          Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        },
         onOpenPairingCamera = ::openPairingCamera,
         onCheckBandConnection = {
           quotaApplication.checkBandConnection { granted ->
@@ -187,19 +204,7 @@ class MainActivity : ComponentActivity() {
   }
 
   private fun openPairingCamera() {
-    val cameraIntent =
-      Intent(MediaStore.INTENT_ACTION_STILL_IMAGE_CAMERA).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    val fallbackIntent =
-      Intent(MediaStore.ACTION_IMAGE_CAPTURE).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    val intent =
-      when {
-        cameraIntent.resolveActivity(packageManager) != null -> cameraIntent
-        fallbackIntent.resolveActivity(packageManager) != null -> fallbackIntent
-        else -> null
-      }
-    if (intent != null) {
-      startActivity(intent)
-    }
+    pairingQrScannerLauncher.launch(Intent(this, PairingQrScannerActivity::class.java))
   }
 
   private fun requestDiagnosticExport(state: AppUiState) {
