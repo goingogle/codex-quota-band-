@@ -282,6 +282,6 @@
 - 中文 `README.md` 与英文 `README_EN.md` 已更新，说明 Band 8 NFC 真机验证、Windows 手机配对三态、应用内扫码、Mi Fitness 锁屏转发限制和当前 fork 尚未发布 GitHub Release。
 - 提交前验证通过：根 Node 契约测试 46/46；Windows Rust workspace 测试 71/71；`cargo fmt --all -- --check`；`git diff --check`。离线 Rust 尝试因隔离缓存缺少 `base64` 索引失败，联网重试通过。
 - 首次提交因本机没有 Git 作者配置而失败；未改动全局配置，仅为本仓库设置 `goingogle <goingogle@users.noreply.github.com>`。
-- 首次推送因 Windows Schannel `SEC_E_NO_CREDENTIALS` 失败；改用 OpenSSL 后端推送成功。初次远端 commit 为 `10a84c9`，后续通过普通合并保留历史并推送最终同步记录。
+- 首次推送因 Windows Schannel `SEC_E_NO_CREDENTIALS` 失败；改用 OpenSSL 后端推送成功。初次远端 commit 为 `10a84c9`，随后通过普通合并保留历史；最终本地与远端 `origin/main` 均为 `2c6927cc70f3115c3be13643c354a78145e4b9c4`。
 - `C:\tmp` 仍保留官方 2026-07-16 stable 清单、完整 82.5 MB rustc 归档和 639 KB rust-mingw 归档；tar 清单确认完整 rustc 归档内实际含 `rustc.exe`/`rustdoc.exe`，先前只是只提取了运行库。
 - 官方清单给出同目标 Cargo 1.97.1 xz 包及 SHA-256；完整离线/便携工具链还需 Cargo 和目标 `rust-std` 组件。应按清单精确提取对应 URL/哈希，只下载缺失组件，并安装到工作区目录而非系统。
