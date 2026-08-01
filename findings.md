@@ -304,7 +304,7 @@
 - 发布说明必须明确这是 `v0.6.0-band8-nfc-preview` 预发布：Windows 是便携 ZIP（非 NSIS 安装器），Android 是 Band 8-only debug-signed APK；不提供 Band 10 RPK 或标准签名 APK。
 - GitHub Release 已创建：tag `v0.6.0-band8-nfc-preview`，Release id `363593611`，状态为 `prerelease=true`、`draft=false`，目标为 `main`。
 - 三个资产均已上传并返回 `state=uploaded`：Windows ZIP 2,904,800 bytes、Band 8-only APK 46,935,400 bytes、`SHA256SUMS.txt` 433 bytes；远端下载 URL 已取得。
-- GitHub API 返回的远端资产 digest 与本地完全一致：APK `81f561e...c5119`、Windows ZIP `1339ce...4376a`、校验文件 `85248b...56d8c`；本地 `main` 为 `0112f6e84027858aa983c65478d494af322205a9`，远端 `main` 已核对同一哈希。
+- GitHub API 返回的远端资产 digest 与本地完全一致：APK `81f561e...c5119`、Windows ZIP `1339ce...4376a`、校验文件 `85248b...56d8c`；最终本地与远端 `main` 均为 `b19718ad3f9c39dc14127b141fbaf48159a0ed3f`。
 - 远端 lightweight tag 查询返回 tag object `913bbedd...3880a`；本地 annotated tag 解引用到发布提交 `3b38bcbfafd649199497f098baae6221528f5ec9`，与 Release 创建时的源码提交一致。
 - 最后一次同时查询 tag 解引用时误用了 PowerShell 会解释的 `^{} ` 语法而失败；改为分别读取 `main` 和 tag ref 后核对成功。
 - 一次提交前复核命令误用 PowerShell 7 的 `||` 语法，当前 PowerShell 解析失败且未执行任何检查；改用兼容 PowerShell 5 的分步命令。
