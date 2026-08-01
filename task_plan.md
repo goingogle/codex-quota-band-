@@ -37,7 +37,7 @@
 - [complete] 阶段 21：核对 Release 版本、发布范围、签名材料与现有构建产物
 - [complete] 阶段 22：构建或整理可公开发布的资产并生成 SHA-256
 - [complete] 阶段 23：创建 Git tag 与 GitHub Release，上传经过核验的资产
-- [in_progress] 阶段 24：核对远端 Release、更新发布文档并记录最终结果
+- [complete] 阶段 24：核对远端 Release、更新发布文档并记录最终结果
 
 ## 完成标准
 
