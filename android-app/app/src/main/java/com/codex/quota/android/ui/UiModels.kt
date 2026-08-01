@@ -22,6 +22,12 @@ enum class DeviceLinkState {
   Unavailable,
 }
 
+data class BandStatusPresentation(
+  val label: String,
+  val status: String,
+  val linkState: DeviceLinkState,
+)
+
 enum class QuotaLevel {
   Healthy,
   Warning,
@@ -53,6 +59,7 @@ data class NotificationSettings(
   val phoneNotifications: Boolean,
   val bandNotifications: Boolean,
   val hideTaskTitles: Boolean = false,
+  val band8NotificationCompatibility: Boolean = false,
 ) {
   companion object {
     val Default =
@@ -63,6 +70,7 @@ data class NotificationSettings(
         phoneNotifications = true,
         bandNotifications = true,
         hideTaskTitles = false,
+        band8NotificationCompatibility = false,
       )
   }
 }
@@ -162,6 +170,34 @@ fun taskStatusEmphasis(state: TaskState): TaskStatusEmphasis =
 
 fun bandConnectionCheckResultLabel(granted: Boolean): String =
   if (granted) "手环已授权，正在同步" else "未取得手环授权，请保持小米运动健康已连接后重试"
+
+fun showBand10Controls(band8Only: Boolean): Boolean = !band8Only
+
+fun bandStatusPresentation(
+  band8Only: Boolean,
+  band8NotificationCompatibility: Boolean,
+  directLinkState: DeviceLinkState,
+): BandStatusPresentation {
+  if (band8Only) {
+    return BandStatusPresentation(
+      label = "手环 8 通知",
+      status = if (band8NotificationCompatibility) "转发已启用" else "转发未启用",
+      linkState =
+        if (band8NotificationCompatibility) DeviceLinkState.Connected
+        else DeviceLinkState.Disconnected,
+    )
+  }
+  return BandStatusPresentation(
+    label = "手环",
+    status =
+      when (directLinkState) {
+        DeviceLinkState.Connected -> "已连接"
+        DeviceLinkState.Disconnected -> "未连接"
+        DeviceLinkState.Unavailable -> "不可用"
+      },
+    linkState = directLinkState,
+  )
+}
 
 /** Returns the delay until the next whole-minute age label update. */
 fun millisecondsUntilNextMinute(nowMs: Long): Long = 60_000L - Math.floorMod(nowMs, 60_000L)

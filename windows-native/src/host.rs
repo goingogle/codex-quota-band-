@@ -155,6 +155,10 @@ impl WindowsHost {
         self.service.active_sync_connections()
     }
 
+    pub async fn phone_paired(&self) -> bool {
+        self.service.phone_token_hash().await.is_some()
+    }
+
     pub fn subscribe_refresh_requests(&self) -> watch::Receiver<u64> {
         self.service.subscribe_refresh_requests()
     }

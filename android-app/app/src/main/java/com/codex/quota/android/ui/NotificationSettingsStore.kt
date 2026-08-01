@@ -17,6 +17,11 @@ class NotificationSettingsStore(context: Context) {
       phoneNotifications = preferences.getBoolean(KEY_PHONE_NOTIFICATIONS, defaults.phoneNotifications),
       bandNotifications = preferences.getBoolean(KEY_BAND_NOTIFICATIONS, defaults.bandNotifications),
       hideTaskTitles = preferences.getBoolean(KEY_HIDE_TASK_TITLES, defaults.hideTaskTitles),
+      band8NotificationCompatibility =
+        preferences.getBoolean(
+          KEY_BAND8_NOTIFICATION_COMPATIBILITY,
+          defaults.band8NotificationCompatibility,
+        ),
     )
   }
 
@@ -28,6 +33,10 @@ class NotificationSettingsStore(context: Context) {
       putBoolean(KEY_PHONE_NOTIFICATIONS, settings.phoneNotifications)
       putBoolean(KEY_BAND_NOTIFICATIONS, settings.bandNotifications)
       putBoolean(KEY_HIDE_TASK_TITLES, settings.hideTaskTitles)
+      putBoolean(
+        KEY_BAND8_NOTIFICATION_COMPATIBILITY,
+        settings.band8NotificationCompatibility,
+      )
     }
   }
 
@@ -39,5 +48,6 @@ class NotificationSettingsStore(context: Context) {
     const val KEY_PHONE_NOTIFICATIONS = "phone-notifications"
     const val KEY_BAND_NOTIFICATIONS = "band-notifications"
     const val KEY_HIDE_TASK_TITLES = "hide-task-titles"
+    const val KEY_BAND8_NOTIFICATION_COMPATIBILITY = "band8-notification-compatibility"
   }
 }

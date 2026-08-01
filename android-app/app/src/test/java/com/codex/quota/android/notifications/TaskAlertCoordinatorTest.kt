@@ -55,6 +55,37 @@ class TaskAlertCoordinatorTest {
   }
 
   @Test
+  fun band8CompatibilityUsesTheSameTaskTransitionPolicyWithoutPhoneOrRpkDelivery() {
+    val phoneAlerts = mutableListOf<SyncedTask>()
+    val rpkAlerts = mutableListOf<SyncedTask>()
+    val band8Alerts = mutableListOf<SyncedTask>()
+    val coordinator =
+      TaskAlertCoordinator(
+        phoneDispatcher = phoneAlerts::add,
+        bandDispatcher = rpkAlerts::add,
+        band8Dispatcher = band8Alerts::add,
+      )
+    coordinator.updateSettings(
+      NotificationSettings(
+        timing = ReminderTiming.Always,
+        waitingForReview = true,
+        needsAuthorization = true,
+        phoneNotifications = false,
+        bandNotifications = false,
+        band8NotificationCompatibility = true,
+      ),
+    )
+
+    coordinator.ingest(snapshot(TaskState.Running), reconnect = true)
+    coordinator.ingest(snapshot(TaskState.WaitingForReview), reconnect = false)
+    coordinator.ingest(snapshot(TaskState.WaitingForReview), reconnect = false)
+
+    assertEquals(emptyList<SyncedTask>(), phoneAlerts)
+    assertEquals(emptyList<SyncedTask>(), rpkAlerts)
+    assertEquals(listOf("手机Codex额度开发"), band8Alerts.map(SyncedTask::title))
+  }
+
+  @Test
   fun reconnectDoesNotReplayAnExistingWaitingTask() {
     val alerts = mutableListOf<SyncedTask>()
     val coordinator = TaskAlertCoordinator(phoneDispatcher = alerts::add, bandDispatcher = {})

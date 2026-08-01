@@ -1,12 +1,21 @@
 # Codex额度 Android
 
-0.6.0 的日常链路为：`Windows → Android Codex额度 → 小米运动健康 → 手环 RPK`。
-AstroBox 只在首次安装或升级 RPK 时临时使用，不参与日常额度同步、任务同步或提醒。
+0.6.0 的日常链路分为两种：
 
-Android 端使用小米官方 `xms-wearable-lib_1.4_release.aar`。该 SDK 二进制受其提供方许可约束，
+- 小米手环 10：`Windows → Android Codex额度 → 小米运动健康 → 手环 RPK`；
+- 小米手环 8 NFC：`Windows → Android Codex额度 → Android 系统通知 → 小米运动健康 → 手环通知列表`。
+
+AstroBox 只在首次安装或升级手环 10 RPK 时临时使用，不参与日常额度同步、任务同步或提醒；
+手环 8 NFC 路径完全不使用 AstroBox 或 RPK。
+
+标准的手环 10 Android 构建使用小米官方 `xms-wearable-lib_1.4_release.aar`。该 SDK 二进制受其提供方许可约束，
 不随本仓库分发；开发者需要从小米官方开发者渠道取得并放入 `android-app/app/libs/`。
 APK 与 RPK 必须使用相同的
 应用包名和配套签名，Wearable SDK 才会把设备权限与 `MessageApi` 数据通道交给该应用。
+
+手环 8 NFC 的通知专用构建不需要该私有 AAR。它必须显式带上
+`-PcodexQuotaBand8Only=true`；该模式只关闭直接 Wearable SDK 桥接，不会关闭 Android 通知、
+Windows 局域网同步或任务提醒。默认构建仍严格要求私有 AAR，避免误把手环 8 空实现装进手环 10 包。
 
 这是 0.6.0 Android 本地候选应用目录。当前包含任务看板、通知决策、Task Sync v1
 严格解析核心、额度 Snapshot v1 严格解析与可信缓存归并，以及用户确认后的三页
@@ -29,7 +38,7 @@ Compose 界面骨架。
   校验证书；IP、局域网发现结果和普通自签名证书都不能替代该身份。
 - Android 只持久化电脑公钥指纹和随机手机令牌，两者以 Keystore 不可导出 AES 密钥
   加密保存，并明确排除云备份和设备迁移；损坏密文会被清除而不是绕过验证。
-- Android 设置页提供“打开系统相机扫码连接”按钮，直接调用系统相机，不申请相机权限；若相机没有自动进入识别模式，请在相机界面点“扫一扫/二维码”。Android 已接入 WSS `/pair` 配对客户端和 `/sync` 自动重连会话；配对深链使用
+- Android 设置页提供“扫码连接电脑”按钮，使用 CameraX 和随 APK 安装的 ML Kit 模型在设备端实时识别二维码；首次使用会申请相机权限，但不会拍照、保存或上传画面。识别出的合法配对链接会直接交给 WSS `/pair` 客户端，随后由 `/sync` 自动重连会话；配对深链使用
   `codexquota://pair`，长期令牌只通过已固定公钥的 TLS 通道返回，不进入二维码。
 - Android Manifest 禁止明文网络；WSS 客户端的信任管理器和主机校验器都会重新核对
   已配对电脑的公钥指纹，不接受系统 CA 或普通自签名证书作为替代。
@@ -56,3 +65,11 @@ $env:ANDROID_HOME = Join-Path $env:LOCALAPPDATA "Android\Sdk"
 $env:ANDROID_SDK_ROOT = $env:ANDROID_HOME
 ..\spikes\android-background-probe\gradlew.bat -p . :app:testDebugUnitTest
 ```
+
+仅构建小米手环 8 NFC 通知版：
+
+```powershell
+..\spikes\android-background-probe\gradlew.bat -p . -PcodexQuotaBand8Only=true :app:testDebugUnitTest :app:lintDebug :app:assembleDebug --console=plain
+```
+
+以上命令只要求 Java 17 和 Android SDK 命令行工具；使用 VS Code 时不必安装 Android Studio。

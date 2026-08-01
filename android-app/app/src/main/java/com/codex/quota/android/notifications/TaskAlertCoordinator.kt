@@ -12,6 +12,7 @@ import com.codex.quota.android.ui.ReminderTiming
 class TaskAlertCoordinator(
   private val phoneDispatcher: (SyncedTask) -> Unit,
   private val bandDispatcher: (SyncedTask) -> Unit,
+  private val band8Dispatcher: (SyncedTask) -> Unit = {},
 ) {
   private val lock = Any()
   private val previousStates = mutableMapOf<String, TaskState>()
@@ -36,6 +37,7 @@ class TaskAlertCoordinator(
           )
         if (delivery.phone) phoneDispatcher(task)
         if (delivery.band) bandDispatcher(task)
+        if (delivery.band8) band8Dispatcher(task)
       }
     }
   }
@@ -58,6 +60,7 @@ class TaskAlertCoordinator(
           needsAuthorization = settings.needsAuthorization,
           phone = settings.phoneNotifications,
           band = settings.bandNotifications,
+          band8 = settings.band8NotificationCompatibility,
         )
     }
   }

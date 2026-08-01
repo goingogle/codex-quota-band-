@@ -26,8 +26,19 @@ class NotificationChannelsTest {
   @Test
   fun headsUpUpgradeUsesFreshChannelIdentifiers() {
     assertEquals(
-      listOf("needs-authorization-v2", "waiting-for-review-v2"),
+      listOf("needs-authorization-v2", "waiting-for-review-v2", "band8-quota-status-v2"),
       NotificationChannels.specs.map(NotificationChannelSpec::id),
     )
+  }
+
+  @Test
+  fun band8QuotaChannelUsesDefaultImportanceWithoutPhoneVibration() {
+    val quota =
+      NotificationChannels.specs.single {
+        it.id == NotificationChannels.BAND8_QUOTA_STATUS_CHANNEL_ID
+      }
+
+    assertEquals(ChannelImportance.Default, quota.importance)
+    assertFalse(quota.vibrate)
   }
 }

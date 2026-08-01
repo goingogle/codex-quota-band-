@@ -91,11 +91,13 @@ private enum class AppTab(val label: String, val icon: ImageVector) {
 fun CodexQuotaApp(
   state: AppUiState,
   modifier: Modifier = Modifier,
+  band8Only: Boolean = false,
   appVersion: String = "0.6.0",
   availableUpdate: AppRelease? = null,
   notificationSettings: NotificationSettings = NotificationSettings.Default,
   onNotificationSettingsChange: (NotificationSettings) -> Unit = {},
   onOpenNotificationSettings: () -> Unit = {},
+  onPushQuotaToBand8: () -> Unit = {},
   onOpenPairingCamera: () -> Unit = {},
   onCheckBandConnection: () -> Unit = {},
   onExportDiagnostics: () -> Unit = {},
@@ -162,6 +164,8 @@ fun CodexQuotaApp(
           AppTab.Home ->
             HomeScreen(
               state = state,
+              band8Only = band8Only,
+              band8NotificationCompatibility = notificationSettings.band8NotificationCompatibility,
               hideTaskTitles = notificationSettings.hideTaskTitles,
               onShowTasks = { selectedTabIndex = AppTab.Tasks.ordinal },
               onRefreshSync = onRefreshSync,
@@ -179,9 +183,11 @@ fun CodexQuotaApp(
           AppTab.Settings ->
             SettingsScreen(
               state = state,
+              band8Only = band8Only,
               settings = notificationSettings,
               onSettingsChange = onNotificationSettingsChange,
               onOpenNotificationSettings = onOpenNotificationSettings,
+              onPushQuotaToBand8 = onPushQuotaToBand8,
               onOpenPairingCamera = onOpenPairingCamera,
               onCheckBandConnection = onCheckBandConnection,
               onExportDiagnostics = onExportDiagnostics,
@@ -231,6 +237,8 @@ private fun rememberAppNowMs(): Long {
 @Composable
 private fun HomeScreen(
   state: AppUiState,
+  band8Only: Boolean,
+  band8NotificationCompatibility: Boolean,
   hideTaskTitles: Boolean,
   onShowTasks: () -> Unit,
   onRefreshSync: () -> Boolean,
@@ -280,7 +288,13 @@ private fun HomeScreen(
       }
       if (state.syncState == SyncState.Offline) item { OfflineCallout() }
       item { QuotaHeroCard(state) }
-      item { ConnectionStatusRow(state) }
+      item {
+        ConnectionStatusRow(
+          state = state,
+          band8Only = band8Only,
+          band8NotificationCompatibility = band8NotificationCompatibility,
+        )
+      }
       item { TaskSummarySection(tasks = phoneTasks.take(2), nowMs = nowMs, onShowTasks = onShowTasks, state = state, hideTaskTitles = hideTaskTitles) }
       item {
         ResetCreditsSection(
@@ -432,7 +446,17 @@ private fun QuotaProgressBar(
 }
 
 @Composable
-private fun ConnectionStatusRow(state: AppUiState) {
+private fun ConnectionStatusRow(
+  state: AppUiState,
+  band8Only: Boolean,
+  band8NotificationCompatibility: Boolean,
+) {
+  val bandStatus =
+    bandStatusPresentation(
+      band8Only = band8Only,
+      band8NotificationCompatibility = band8NotificationCompatibility,
+      directLinkState = state.connections.band,
+    )
   CodexGlassCard(
     modifier = Modifier.fillMaxWidth().padding(horizontal = 2.dp).height(76.dp),
     shape = RoundedCornerShape(CodexTokens.Radius.Navigation),
@@ -457,13 +481,9 @@ private fun ConnectionStatusRow(state: AppUiState) {
       Box(modifier = Modifier.width(1.dp).height(38.dp).background(dividerColor()))
       DeviceStatusItem(
         icon = Icons.Outlined.Watch,
-        label = "手环",
-        status = when (state.connections.band) {
-          DeviceLinkState.Connected -> "已连接"
-          DeviceLinkState.Disconnected -> "未连接"
-          DeviceLinkState.Unavailable -> "不可用"
-        },
-        color = deviceStateColor(state.connections.band),
+        label = bandStatus.label,
+        status = bandStatus.status,
+        color = deviceStateColor(bandStatus.linkState),
         modifier = Modifier.weight(1f),
       )
     }
@@ -717,9 +737,11 @@ private fun TaskBoardRow(task: SyncedTask, nowMs: Long, hideTaskTitles: Boolean,
 @Composable
 private fun SettingsScreen(
   state: AppUiState,
+  band8Only: Boolean,
   settings: NotificationSettings,
   onSettingsChange: (NotificationSettings) -> Unit,
   onOpenNotificationSettings: () -> Unit,
+  onPushQuotaToBand8: () -> Unit,
   onOpenPairingCamera: () -> Unit,
   onCheckBandConnection: () -> Unit,
   onExportDiagnostics: () -> Unit,
@@ -728,6 +750,7 @@ private fun SettingsScreen(
   nowMs: Long,
   modifier: Modifier,
 ) {
+  val showBand10 = showBand10Controls(band8Only)
   LazyColumn(
     modifier = modifier.statusBarsPadding(),
     contentPadding = PaddingValues(top = 14.dp, bottom = 90.dp),
@@ -737,8 +760,29 @@ private fun SettingsScreen(
     item {
       SettingsGroup("连接与设备") {
         SettingsActionRow("扫码连接电脑", "扫描 Windows 托盘中的配对二维码", "›", onOpenPairingCamera)
+        if (showBand10) {
+          SettingsDivider()
+          SettingsActionRow("检查手环 10 应用连接", "重新请求 Wearable SDK 权限，不接管小米运动健康连接", "›", onCheckBandConnection)
+        }
+      }
+    }
+    item {
+      SettingsGroup("小米手环 8 NFC") {
+        SettingsSwitchRow(
+          "通知兼容模式",
+          "由小米运动健康转发；配额仅在关键变化时自动更新",
+          settings.band8NotificationCompatibility,
+        ) {
+          onSettingsChange(settings.copy(band8NotificationCompatibility = it))
+        }
         SettingsDivider()
-        SettingsActionRow("检查手环连接", "重新请求手环数据权限，不接管小米运动健康连接", "›", onCheckBandConnection)
+        SettingsActionRow(
+          "立即发送配额",
+          "在手环通知列表查看当前摘要；手机通知栏也会保留一条",
+          "›",
+          onPushQuotaToBand8,
+        )
+        SettingsInfoRow("首次使用请在小米运动健康中允许“Codex额度”通知")
       }
     }
     item {
@@ -754,8 +798,10 @@ private fun SettingsScreen(
         SettingsSwitchRow("等待查看提醒", "手机和手环", settings.waitingForReview) { onSettingsChange(settings.copy(waitingForReview = it)) }
         SettingsDivider()
         SettingsSwitchRow("手机通知", "受 Android 系统权限控制", settings.phoneNotifications) { onSettingsChange(settings.copy(phoneNotifications = it)) }
-        SettingsDivider()
-        SettingsSwitchRow("手环提醒", "震动由小米运动健康和手环系统决定", settings.bandNotifications) { onSettingsChange(settings.copy(bandNotifications = it)) }
+        if (showBand10) {
+          SettingsDivider()
+          SettingsSwitchRow("手环 10 应用提醒", "通过 Wearable SDK 发送到手环应用", settings.bandNotifications) { onSettingsChange(settings.copy(bandNotifications = it)) }
+        }
         SettingsDivider()
         SettingsActionRow("Android 系统通知设置", "打开系统通知渠道设置", "›", onOpenNotificationSettings)
       }
@@ -841,6 +887,22 @@ private fun SettingsGroup(title: String, content: @Composable ColumnScope.() -> 
 
 @Composable
 private fun SettingsDivider() = HorizontalDivider(color = dividerColor())
+
+@Composable
+private fun SettingsInfoRow(text: String) {
+  Surface(
+    modifier = Modifier.fillMaxWidth().padding(bottom = 11.dp),
+    shape = RoundedCornerShape(12.dp),
+    color = MaterialTheme.colorScheme.primary.copy(alpha = .08f),
+  ) {
+    Text(
+      text,
+      modifier = Modifier.padding(horizontal = 12.dp, vertical = 9.dp),
+      fontSize = CodexTokens.Type.Caption,
+      color = MaterialTheme.colorScheme.primary,
+    )
+  }
+}
 
 @Composable
 private fun SettingsActionRow(label: String, supporting: String, trailing: String, onClick: () -> Unit) {

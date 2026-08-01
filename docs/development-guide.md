@@ -59,6 +59,16 @@ $env:ANDROID_SDK_ROOT = $env:ANDROID_HOME
 ..\spikes\android-background-probe\gradlew.bat -p . :app:testDebugUnitTest :app:lintDebug :app:assembleDebug --console=plain
 ```
 
+上面的默认命令是手环 10 标准构建，必须存在
+`android-app/app/libs/xms-wearable-lib_1.4_release.aar`。仅验证小米手环 8 NFC 通知兼容时，使用显式专用模式：
+
+```powershell
+..\spikes\android-background-probe\gradlew.bat -p . -PcodexQuotaBand8Only=true :app:testDebugUnitTest :app:lintDebug :app:assembleDebug --console=plain
+```
+
+该模式不会读取私有 Wearable AAR，只使用 Android 原生通知与小米运动健康镜像；不带参数的标准构建仍会在 AAR
+缺失时明确失败。Java 17 和 Android SDK 可放在工作区作为便携工具链，VS Code 用户不必安装 Android Studio。
+
 如需在没有真实 5 小时上游数据时检查 Android 排版，可在本地构建命令中临时加入
 `-PcodexQuotaDemoFiveHour=true`。该参数只把手机界面显示为 68%，不会写入额度缓存或下发手环；
 它默认关闭，正式候选必须在不带该参数的情况下重新构建。
@@ -91,6 +101,7 @@ npm run build:release
 | Android UI/任务板 | Android 单测、lint、assemble | 三页布局、竖向滚动、移除二次确认 |
 | 通知 | 通知/策略单测 | ChatGPT 失焦、后台/锁屏、通知栏和手环震动 |
 | Wearable/RPK | Android 构建 + RPK 构建测试 | 小米运动健康连接保持、手环页面可读 |
+| 手环 8 NFC 通知兼容 | 带 `-PcodexQuotaBand8Only=true` 的 Android 通知/策略单测、lint、assemble | 小米运动健康应用通知白名单、配额阈值去重、任务状态和原生通知列表 |
 | 安装器 | 构建脚本 + 安装器 smoke test | 当前用户安装、启动和卸载 |
 
 自动测试不能替代用户验收。用户已于 2026-07-29 确认当前 Windows、Android 与手环候选均通过验收；
@@ -101,6 +112,7 @@ npm run build:release
 - 当前 `0.6.0` 只生成本地候选包；不要把本地候选写成已发布版本。
 - Windows、Android APK、手环 RPK 的产品版本必须一致；协议版本单独维护在 `contract/`。
 - 手环 UI 修改必须先给用户看 `212×520` 预览，确认后才改 RPK 源码。
+- Android UI 修改同样必须先提供预览并由用户确认；手环 8 NFC 通知兼容不修改或构建 RPK。
 - 用户已确认 `0.6.0` 三端候选验收通过；但提交、推送和 GitHub Release 仍须由用户另行要求。发布前展示版本、改动、测试、产物和 SHA-256。
 - Debug APK/RPK 仅用于开发和真机验证；正式产物应使用固定发布签名，私钥不得进入仓库。
 

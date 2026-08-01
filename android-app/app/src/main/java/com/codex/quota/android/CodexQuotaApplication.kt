@@ -2,6 +2,9 @@ package com.codex.quota.android
 
 import android.app.Application
 import android.net.Uri
+import com.codex.quota.android.notifications.Band8NotificationResult
+import com.codex.quota.android.notifications.Band8QuotaAlertCoordinator
+import com.codex.quota.android.notifications.Band8QuotaNotificationDispatcher
 import com.codex.quota.android.notifications.NotificationChannels
 import com.codex.quota.android.notifications.TaskAlertCoordinator
 import com.codex.quota.android.notifications.TaskNotificationDispatcher
@@ -18,6 +21,7 @@ import com.codex.quota.android.ui.NotificationSettingsStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class CodexQuotaApplication : Application() {
@@ -29,6 +33,8 @@ class CodexQuotaApplication : Application() {
   private lateinit var connectionStore: ConnectionIdentityStore
   private lateinit var syncClient: SyncWebSocketClient
   private lateinit var taskAlerts: TaskAlertCoordinator
+  private lateinit var band8QuotaAlerts: Band8QuotaAlertCoordinator
+  private lateinit var band8QuotaDispatcher: Band8QuotaNotificationDispatcher
 
   override fun onCreate() {
     super.onCreate()
@@ -37,13 +43,24 @@ class CodexQuotaApplication : Application() {
     connectionStore = ConnectionIdentityStore(this)
     wearableBridge = XiaomiWearableBridge(this, runtimeRepository)
     val phoneDispatcher = TaskNotificationDispatcher(this)
+    band8QuotaDispatcher = Band8QuotaNotificationDispatcher(this)
+    band8QuotaAlerts =
+      Band8QuotaAlertCoordinator { state ->
+        band8QuotaDispatcher.notify(state)
+      }
     taskAlerts =
       TaskAlertCoordinator(
         phoneDispatcher = { phoneDispatcher.notify(it) },
         bandDispatcher = { wearableBridge.sendTaskAlert(it) },
+        band8Dispatcher = { phoneDispatcher.notify(it, bridgeToWearable = true) },
       )
-    taskAlerts.updateSettings(NotificationSettingsStore(this).load())
+    val notificationSettings = NotificationSettingsStore(this).load()
+    taskAlerts.updateSettings(notificationSettings)
+    band8QuotaAlerts.updateEnabled(notificationSettings.band8NotificationCompatibility)
     syncClient = SyncWebSocketClient(applicationScope, runtimeRepository, taskAlerts)
+    applicationScope.launch {
+      runtimeRepository.state.collect { state -> band8QuotaAlerts.ingest(state) }
+    }
     wearableBridge.start()
     startSavedConnection()
   }
@@ -58,7 +75,12 @@ class CodexQuotaApplication : Application() {
 
   fun updateNotificationSettings(settings: NotificationSettings) {
     taskAlerts.updateSettings(settings)
+    band8QuotaAlerts.updateEnabled(settings.band8NotificationCompatibility)
+    band8QuotaAlerts.ingest(runtimeRepository.state.value)
   }
+
+  fun pushQuotaToBand8(): Band8NotificationResult =
+    band8QuotaDispatcher.notify(runtimeRepository.state.value)
 
   fun setAndroidForeground(foreground: Boolean) {
     taskAlerts.setAndroidForeground(foreground)

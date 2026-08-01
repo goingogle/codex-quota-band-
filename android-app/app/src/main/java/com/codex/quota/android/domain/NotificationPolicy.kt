@@ -30,6 +30,7 @@ data class AlertContext(
 data class AlertDelivery(
   val phone: Boolean,
   val band: Boolean,
+  val band8: Boolean,
   val phoneUrgency: PhoneUrgency?,
   val bandBehavior: BandAlertBehavior?,
 ) {
@@ -38,6 +39,7 @@ data class AlertDelivery(
       AlertDelivery(
         phone = false,
         band = false,
+        band8 = false,
         phoneUrgency = null,
         bandBehavior = null,
       )
@@ -50,6 +52,7 @@ class NotificationPolicy private constructor(
   private val needsAuthorization: Boolean,
   private val phone: Boolean,
   private val band: Boolean,
+  private val band8: Boolean,
 ) {
   fun plan(state: TaskState, context: AlertContext): AlertDelivery {
     val eventEnabled =
@@ -69,7 +72,7 @@ class NotificationPolicy private constructor(
         !timingAllows ||
         context.androidForeground ||
         (context.reconnect && state == TaskState.WaitingForReview) ||
-        (!phone && !band)
+        (!phone && !band && !band8)
     ) {
       return AlertDelivery.None
     }
@@ -77,6 +80,7 @@ class NotificationPolicy private constructor(
     return AlertDelivery(
       phone = phone,
       band = band,
+      band8 = band8,
       phoneUrgency =
         if (phone) {
           when (state) {
@@ -98,6 +102,7 @@ class NotificationPolicy private constructor(
       needsAuthorization: Boolean,
       phone: Boolean,
       band: Boolean,
+      band8: Boolean = false,
     ) =
       NotificationPolicy(
         mode = mode,
@@ -105,6 +110,7 @@ class NotificationPolicy private constructor(
         needsAuthorization = needsAuthorization,
         phone = phone,
         band = band,
+        band8 = band8,
       )
 
     fun default() =
@@ -114,6 +120,7 @@ class NotificationPolicy private constructor(
         needsAuthorization = true,
         phone = true,
         band = true,
+        band8 = false,
       )
   }
 }
