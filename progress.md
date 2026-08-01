@@ -135,9 +135,8 @@
 - Windows 安装完成后首次启动暴露上游打包缺陷：`CodexQuota.exe` 依赖但安装器未携带 `libunwind.dll`；上游 v0.6.1 的安装脚本仍未包含该文件。
 - 已从 Rust 官方 2026-07-16 稳定版 `rustc 1.97.1 x86_64-pc-windows-gnullvm` 包提取 90,624-byte `libunwind.dll`；82.5MB 源包官方 SHA-256 与发布清单一致，复制后的 DLL SHA-256 为 `13BF4E99B0193634EBDEB0BBDEFF9753B39F1D04799183F664111014AABF4C2C`。
 - 安装向导停在成功完成页，等待用户确认点击“完成”并启动新下载的软件；之后将验证托盘进程、配对二维码和手机同步。
-
 ## 2026-08-02：GitHub 同步完成
 
 - 已完成中英文 README 更新和提交前终审。
-- 已创建提交 `10a84c9`：`feat: add Band 8 NFC compatibility and pairing status`。
-- 已推送至 `https://github.com/goingogle/codex-quota-band-.git` 的 `main` 分支；远端哈希与本地一致，工作树干净。
+- 已创建并推送 `feat: add Band 8 NFC compatibility and pairing status`，随后以普通合并保留远端已有提交历史。
+- 最终同步仍需在合并提交完成后再次核对远端哈希。
