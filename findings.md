@@ -304,5 +304,6 @@
 - 发布说明必须明确这是 `v0.6.0-band8-nfc-preview` 预发布：Windows 是便携 ZIP（非 NSIS 安装器），Android 是 Band 8-only debug-signed APK；不提供 Band 10 RPK 或标准签名 APK。
 - 一次提交前复核命令误用 PowerShell 7 的 `||` 语法，当前 PowerShell 解析失败且未执行任何检查；改用兼容 PowerShell 5 的分步命令。
 - Git credential helper 使用 Windows Credential Manager；系统没有 `gh`，可在受控网络权限下通过 GitHub REST API 使用已配置的 Git 凭据创建 Release，令牌不得输出到日志。
+- 在 escalated 用户上下文中直接从仓库工作目录读取 tag 触发 dubious ownership；从父目录调用 `origin` 又因没有仓库配置失败；最终改用远端 HTTPS URL 直接查询，确认没有现存 `v0.6.0*` tag。
 - Android Band 8-only wrapper 命令因 Gradle Wrapper 未命中工作区已解压的 Gradle 9.1.0，尝试联网下载且被沙箱拒绝；改用 `work/android-toolchain/gradle-runtime/gradle-9.1.0/bin/gradle.bat` 直接执行。
 - 直接 Gradle 命令在 5 分钟内没有输出且未更新 APK，已终止本次受控构建；未发现残留 Java 进程。此前已完成的 Band 8-only Android 107/107、Lint、assemble 证据仍可用于预发布说明，但本轮不把长时间无输出误报为新构建通过。
