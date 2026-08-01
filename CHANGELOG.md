@@ -4,13 +4,25 @@
 
 This file records user-visible changes in each public version. Release dates follow GitHub Releases.
 
-> `0.6.0` 目前是已完成构建与真机验收的本地候选，尚未发布；未发布变更、三端当前状态和验证证据记录在
-> `docs/current-status.md`、`docs/build-verification.md` 与 `docs/device-acceptance.md`。
-> 在获得发布授权前不提前写入正式版本日志。
+> `v0.6.0-band8-nfc-preview` 已作为预发布创建。它只发布手环 8 NFC 通知兼容所需的 Windows portable ZIP 和 Band 8-only
+> Debug APK；正式 Windows 安装器、正式签名 APK 和手环 10 RPK 不在本次资产中。
 
 > `0.3.0` 之前，Windows、AstroBox 和手环 RPK 的版本号并非始终同步；以下早期条目会注明对应组件。
 >
 > Before `0.3.0`, Windows, AstroBox, and band RPK versions were not always synchronized. Early entries identify the affected component.
+
+## [0.6.0-band8-nfc-preview] - 2026-08-02
+
+### 新增 / Added
+
+- 小米手环 8 NFC 的 Android 原生通知兼容模式，配额摘要和任务状态由小米运动健康转发到手环。
+- Windows 客户端显示 Android 手机的未配对、已配对离线、已配对在线三种状态。
+- 提供 Windows x64 portable ZIP、Band 8-only Debug APK 和 SHA-256 校验文件。
+
+### 限制 / Limitations
+
+- Windows portable ZIP 不是 NSIS 安装器，Android APK 使用调试签名。
+- 本次不提供小米手环 10 RPK、标准 Wearable AAR 构建或正式签名 APK。
 
 ## [0.3.1] - 2026-07-21
 

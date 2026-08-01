@@ -9,11 +9,11 @@ Smart Band 10 uses the dedicated band app; Smart Band 8 NFC uses the validated n
   <img src="assets/icon.svg" alt="Codex Quota icon" width="96">
 </p>
 
-Current version: **0.6.0 fork build**
+Current version: **0.6.0 Band 8 NFC preview**
 
-The Smart Band 8 NFC notification compatibility mode has been built and validated on a real band for quota summaries and task
-notifications. The Windows client distinguishes “Not paired,” “Paired · offline,” and “Paired · online” in its connection
-diagnostics. This fork has synchronized source changes, but has not published a GitHub Release binary yet.
+The fork has published the `v0.6.0-band8-nfc-preview` pre-release. Its Smart Band 8 NFC notification compatibility mode has been
+validated on a real band for quota summaries and task notifications. The Windows client distinguishes “Not paired,” “Paired ·
+offline,” and “Paired · online” in its connection diagnostics.
 
 [View changelog](CHANGELOG.md)
 
@@ -55,26 +55,25 @@ Building the standard Smart Band 10 Android app from source requires `xms-wearab
 
 ## Download
 
-Download matching files from the [goingogle fork Releases](https://github.com/goingogle/codex-quota-band-/releases) page after a release is published:
-
-No Release has been published on this fork yet. To use the current changes, build from source using the [development guide](docs/development-guide.md).
+Download the current files from the [`v0.6.0-band8-nfc-preview` pre-release](https://github.com/goingogle/codex-quota-band-/releases/tag/v0.6.0-band8-nfc-preview). This preview targets the Smart Band 8 NFC notification path:
 
 | Install on | File |
 | --- | --- |
-| Windows computer | `Codex-Quota-Setup-0.6.0.exe` |
-| Android phone | `CodexQuota-0.6.0.apk` |
-| Xiaomi Smart Band 10 (AstroBox only for sideloading) | `com.codex.quota.android.release.0.6.0.rpk` |
-| Xiaomi Smart Band 8 NFC | No extra file; use the Android APK notification mode |
+| Windows computer | `CodexQuota-0.6.0-Windows-x64-portable.zip` |
+| Android phone (Smart Band 8 NFC) | `CodexQuota-0.6.0-band8-nfc-debug.apk` |
+| Xiaomi Smart Band 10 | No RPK is included in this preview |
+| Xiaomi Smart Band 8 NFC | Use the Android APK and Xiaomi Fitness notification mirroring |
 
-Smart Band 10 uses all three matching components. Smart Band 8 NFC uses the matching Windows and Android packages only.
+This is a pre-release: the Windows file is a portable ZIP rather than an NSIS installer, and the Android APK is debug-signed for
+the Band 8-only notification build. Verify `SHA256SUMS.txt` from the Release page before installing.
 
 ## Installation
 
-### 1. Install the Windows app
+### 1. Run the Windows portable app
 
-1. Run `Codex-Quota-Setup-0.6.0.exe`.
-2. After installation, the app stays in the Windows notification area. If it is hidden, click the `^` icon in the taskbar.
-3. The current test build is not commercially code-signed, so Windows may display an “Unknown publisher” warning. Download only from this repository and verify the SHA-256 value shown on the Release page.
+1. Extract `CodexQuota-0.6.0-Windows-x64-portable.zip` and keep `CodexQuota.exe` beside `libunwind.dll`.
+2. Run `CodexQuota.exe`; it stays in the Windows notification area. If it is hidden, click the `^` icon in the taskbar.
+3. Right-click the tray icon to show pairing information and continue with phone QR pairing.
 
 ### 2. Install the Android app
 

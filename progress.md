@@ -140,3 +140,19 @@
 - 已完成中英文 README 更新和提交前终审。
 - 已创建并推送 `feat: add Band 8 NFC compatibility and pairing status`，随后以普通合并保留远端已有提交历史。
 - 最终合并提交 `2c6927c` 已推送，远端哈希与本地一致，工作树干净。
+
+## 2026-08-02：创建 GitHub Release
+
+- 用户已要求创建 Release，新增阶段 21–24；先核对版本、tag、构建工具、签名材料和可发布资产。
+- 已发现项目没有自动 Release 工作流；Windows 安装器、Android 标准 release 和手环 RPK 的构建条件不同，需先做能力审计再发布。
+- 一次全工作区递归工具搜索超时并已终止；改用定点路径和命令发现，未把超时误判为构建失败。
+- 工具能力审计完成：便携 Cargo/Java/Android SDK/Gradle 可用，NSIS、GitHub CLI 和私有 Wearable AAR 不在已知路径；当前仅有 Android debug APK 输出。
+- 已确认 Windows 无根 toolchain 配置，Android release signing/私有 AAR 配置也不存在；发布构建需显式指定便携工具链并限定为可验证的 Band 8-only 资产，除非发现正式签名材料。
+- Windows release 首次构建已启动但因找不到 `x86_64-w64-mingw32-clang` 失败；已定位便携 LLVM-MinGW，准备显式设置 PATH 重试。
+- Windows release 已用便携 Cargo + LLVM-MinGW 构建成功；下一步整理带 `libunwind.dll` 的可运行便携 ZIP，并核对 Android Band 8 APK。
+- 已核对当前 debug APK 元数据为 `com.codex.quota.android` / `0.6.0`；因 Release 构建签名材料缺失，先按 Band 8-only 预发布路线重新验证，不伪装成正式签名 APK。
+- Android wrapper 首次验证因尝试下载 Gradle 9.1.0 被沙箱拒绝；工作区已有完整 Gradle runtime，下一次绕过 wrapper 直接运行。
+- 直接 Gradle 运行超过 5 分钟无输出，已终止；现有 APK 时间戳未变化，继续使用先前已验证的 Band 8-only debug 产物并在 Release 中明确其调试签名性质。
+- Windows portable ZIP、Band 8-only debug APK 和 SHA256SUMS 已整理到工作区 `release-assets/v0.6.0-band8-nfc-preview/`，ZIP 内含运行所需 `libunwind.dll`。
+- 已确定 Release 采用 `v0.6.0-band8-nfc-preview` 预发布标签，上传 Windows portable ZIP、Band 8-only debug APK 和 SHA256SUMS，不上传 Band 10 RPK/标准 release APK。
+- 提交前复核脚本因 PowerShell 5 不支持 `||` 而未执行；已记录并改为兼容语法重跑。

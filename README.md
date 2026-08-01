@@ -10,10 +10,10 @@
 </p>
 
 <p align="center">
-  <strong>当前版本：0.6.0</strong>
+  <strong>当前版本：0.6.0 Band 8 NFC 预发布</strong>
 </p>
 
-> 当前 fork 的 `0.6.0` 适配状态：小米手环 8 NFC 的 Android 通知兼容模式已经完成构建，并已在真实手环上验证配额摘要和任务通知转发。Windows 客户端的“连接与诊断”会区分“未配对”“已配对 · 离线”和“已配对 · 在线”。目前已同步源码，尚未发布 GitHub Release 安装包。
+> 当前 fork 已发布 `v0.6.0-band8-nfc-preview` 预发布：小米手环 8 NFC 的 Android 通知兼容模式已在真实手环上验证配额摘要和任务通知转发。Windows 客户端的“连接与诊断”会区分“未配对”“已配对 · 离线”和“已配对 · 在线”。
 
 ## 它能做什么
 
@@ -50,27 +50,24 @@
 
 ## 下载
 
-正式版本发布后，请从[本 fork 的 GitHub Releases](https://github.com/goingogle/codex-quota-band-/releases)下载同一版本的文件：
-
-当前 fork 尚未发布 Release；如需立即使用，请按[开发指南](docs/development-guide.md)从源码构建。不要把工作区临时构建产物当作正式 Release 下载。
+请从 [v0.6.0-band8-nfc-preview 预发布](https://github.com/goingogle/codex-quota-band-/releases/tag/v0.6.0-band8-nfc-preview) 下载当前可用文件。该版本专门面向小米手环 8 NFC 通知兼容路径：
 
 | 安装位置 | 文件 |
 | --- | --- |
-| Windows 电脑 | `Codex-Quota-Setup-0.6.0.exe` |
-| 安卓手机 | `CodexQuota-0.6.0.apk` |
-| 小米手环 10 | `com.codex.quota.android.release.0.6.0.rpk` |
-| 小米手环 8 NFC | 无额外安装包，使用安卓 APK 的通知兼容模式 |
+| Windows 电脑 | `CodexQuota-0.6.0-Windows-x64-portable.zip` |
+| 安卓手机（手环 8 NFC） | `CodexQuota-0.6.0-band8-nfc-debug.apk` |
+| 小米手环 10 | 此预发布不提供 RPK |
+| 小米手环 8 NFC | 使用上面的 Android APK，通过小米运动健康转发通知 |
 
-使用小米手环 10 时三个文件的版本号必须一致；使用小米手环 8 NFC 时只需同版本的 Windows 程序和安卓 APK。
-不要从不明网站下载安装包。
+这是预发布版本：Windows 文件是便携 ZIP（不是 NSIS 安装器），Android APK 使用调试签名，仅建议用于本项目当前的手环 8 NFC 验收。下载后请按 Release 页面提供的 `SHA256SUMS.txt` 校验文件，不要从不明网站下载安装包。
 
 ## 安装和连接
 
-### 第一步：安装 Windows 程序
+### 第一步：运行 Windows 便携版
 
-1. 双击 `Codex-Quota-Setup-0.6.0.exe`。
-2. 安装完成后，Codex额度会出现在任务栏右下角的通知区域；如果没有看到，请点击 `^`。
-3. 安装完成页会默认启动程序并显示配对二维码。
+1. 下载并解压 `CodexQuota-0.6.0-Windows-x64-portable.zip`，保持其中的 `CodexQuota.exe` 和 `libunwind.dll` 在同一目录。
+2. 运行 `CodexQuota.exe`；程序会出现在任务栏右下角的通知区域。
+3. 右击托盘图标打开配对信息，继续完成手机扫码配对。
 4. 重启 ChatGPT，在「ChatGPT → 设置 → 钩子 → 信任全部钩子」中确认以下四项已开启：
    `PreToolUse`、`PermissionRequest`、`UserPromptSubmit`、`Stop`。
 

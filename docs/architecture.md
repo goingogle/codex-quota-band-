@@ -13,12 +13,12 @@ CodexQuota 让用户在不抢占小米运动健康主连接的前提下，在手
 
 当前产品是 Android-only 的本地工具，不是 ChatGPT 客户端替代品，也不提供反向控制、回复消息或远程操作电脑。
 
-## 1.1 当前候选状态（2026-07-31）
+## 1.1 当前候选状态（2026-08-02）
 
 三端当前验收状态、临时版本差异和未决产品冲突以 [current-status.md](current-status.md) 为准。本节只记录
 当前代码和协议事实，不能据此覆盖 `CONTEXT.md` 中已经确认的产品交互。
 
-- 当前代码与配置基线：`0.6.0 / versionCode 600`，Windows、Android APK 和手环 RPK 按同一产品版本管理；本地候选构建、自动验证与三端真机验收已完成，尚未提交、推送或发布。
+- 当前代码与配置基线：`0.6.0 / versionCode 600`；fork 已推送到 `main`，并发布 `v0.6.0-band8-nfc-preview` 预发布。该预发布只包含 Windows portable ZIP 和 Band 8-only Debug APK，不包含标准 Android release、手环 10 RPK 或 NSIS 安装器。
 - 自动化验证：根目录 42/42、Windows 72/72、Android 95/95 加 lint/release、手环 27/27 均通过；产物与哈希以 [build-verification.md](build-verification.md) 顶部的 `0.6.0` 记录为准。
 - 前一轮已完成的真机链路：二维码配对、额度同步、任务标题与状态、任务本机移除、失焦/锁屏通知、手环提醒，
   以及 Windows 安装器启动和覆盖安装流程；Android 手机 App 的首页、任务页和设置页已通过用户最终验收。
@@ -36,8 +36,8 @@ CodexQuota 让用户在不抢占小米运动健康主连接的前提下，在手
   Cookie、卡片唯一 ID、标题、描述或原始响应。
 - 配对后的额度协议保持协商式兼容：客户端声明 v1 时继续收到 v1，声明 v2 时收到无卡片身份字段的
   重置卡时间摘要，只有声明 v3 才收到上游新鲜度。任何快照都必须与当前连接的 Server Hello 匹配。
-- 验收与发布状态：用户已确认 Windows、Android 和手环 `0.6.0` 候选均验收通过，三端产品版本已经统一；尚未提交、推送或创建 GitHub Release，发布操作必须由用户另行要求。
-- 当前工作区新增小米手环 8 NFC 通知兼容源码，但未修改手环 10 RPK。该兼容路径尚未完成 Android 构建和手环 8 NFC 真机验收，不能并入上一条 `0.6.0` 证据。
+- 验收与发布状态：用户已确认 Windows、Android 和手环 8 NFC 通知兼容链路完成当前范围验收；正式签名和手环 10 RPK 仍需后续单独构建。
+- 当前工作区新增小米手环 8 NFC 通知兼容源码，但未修改手环 10 RPK。预发布 Android APK 使用 Band 8-only Debug 构建，不应误装到手环 10 RPK 路径。
 
 ## 2. 运行链路
 

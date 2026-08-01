@@ -1,16 +1,15 @@
 # CodexQuota 当前状态
 
-更新时间：2026-08-01。
+更新时间：2026-08-02。
 
 ## 当前版本
 
-`0.6.0 / versionCode 600` 已在 Windows、安卓手机和小米手环 10 上完成自动验证与真机验收。
+`0.6.0 / versionCode 600` 的手环 8 NFC 通知兼容预发布已创建；Windows 便携版和 Band 8-only Android APK 已上传到 GitHub Release。
 
-本版本仍是本地候选：尚未提交、推送或创建 GitHub Release。
+预发布标签为 [`v0.6.0-band8-nfc-preview`](https://github.com/goingogle/codex-quota-band-/releases/tag/v0.6.0-band8-nfc-preview)。它不包含小米手环 10 RPK、标准 Wearable AAR 构建或正式签名 APK。
 
-当前工作区另有“小米手环 8 NFC 通知兼容模式”的源码改动。它没有修改手环 10 RPK，也不属于上面已经通过的
-`0.6.0` 三端真机验收证据。工作区便携 Java 17、Android SDK 和 Gradle 已配置完成；不依赖私有 Wearable AAR 的
-Band 8-only Debug 构建、Android 107/107 单元测试与 Lint 已通过，现只剩手机安装和手环 8 NFC 真机验收。
+当前发布资产使用不依赖私有 Wearable AAR 的 Band 8-only Debug APK；它不修改手环 10 RPK。Windows 便携版包含运行所需
+`libunwind.dll`，Android APK 使用调试签名，适合当前用户验收，不应当作为长期稳定更新渠道。
 
 ## 当前能力
 
@@ -29,8 +28,8 @@ Band 8-only Debug 构建、Android 107/107 单元测试与 Lint 已通过，现�
 - `等待查看` 只表示当前一轮停止并等待用户查看，不表示成功或失败。
 - 手环 8 NFC 兼容依赖小米运动健康转发 Android 系统通知；手机无需访问 OpenAI 或开启代理，但必须保留 Android App 和小米运动健康。
 
-## 下一步
+## 发布边界
 
-1. 通过 USB 调试把已生成的 Band 8-only Debug APK 安装到安卓手机。
+1. Band 8 NFC 用户下载 Release 中的 Windows portable ZIP 和 Debug APK。
 2. 按 [device-acceptance.md](device-acceptance.md) 完成小米手环 8 NFC 真机验收。
-3. Git 提交、推送和 GitHub Release 都需要维护者单独明确授权。
+3. 正式 Windows 安装器、正式签名 APK 和手环 10 RPK 需要后续补齐 NSIS、发布签名和私有 Wearable SDK 后另行发布。

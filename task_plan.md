@@ -34,6 +34,10 @@
 - [complete] 阶段 18：核对 Git 分支、远程仓库与本次同步范围
 - [complete] 阶段 19：更新中英文 README，运行提交前完整检查
 - [complete] 阶段 20：提交并推送到用户 fork 的 GitHub 仓库，核对远端结果
+- [complete] 阶段 21：核对 Release 版本、发布范围、签名材料与现有构建产物
+- [complete] 阶段 22：构建或整理可公开发布的资产并生成 SHA-256
+- [in_progress] 阶段 23：创建 Git tag 与 GitHub Release，上传经过核验的资产
+- [pending] 阶段 24：核对远端 Release、更新发布文档并记录最终结果
 
 ## 完成标准
 

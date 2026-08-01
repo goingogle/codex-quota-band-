@@ -285,3 +285,24 @@
 - 首次推送因 Windows Schannel `SEC_E_NO_CREDENTIALS` 失败；改用 OpenSSL 后端推送成功。初次远端 commit 为 `10a84c9`，随后通过普通合并保留历史；最终本地与远端 `origin/main` 均为 `2c6927cc70f3115c3be13643c354a78145e4b9c4`。
 - `C:\tmp` 仍保留官方 2026-07-16 stable 清单、完整 82.5 MB rustc 归档和 639 KB rust-mingw 归档；tar 清单确认完整 rustc 归档内实际含 `rustc.exe`/`rustdoc.exe`，先前只是只提取了运行库。
 - 官方清单给出同目标 Cargo 1.97.1 xz 包及 SHA-256；完整离线/便携工具链还需 Cargo 和目标 `rust-std` 组件。应按清单精确提取对应 URL/哈希，只下载缺失组件，并安装到工作区目录而非系统。
+
+## 2026-08-02：创建 GitHub Release 的初步核对
+
+- 用户已明确授权创建 GitHub Release；这是对之前“只同步源码、不创建 Release”边界的新增任务。
+- 当前项目没有独立的 release checklist 或自动发布工作流；Windows 正式安装器脚本需要 Cargo 和 NSIS，Android 标准 release 需要私有 Wearable AAR 与固定签名，手环 RPK 需要与 Android APK 一致的发布证书。
+- 仓库文档仍把 `0.6.0` 描述为本地候选，并记录旧构建数量/哈希；创建 Release 前必须以当前源码重新核对资产，不能直接沿用旧候选哈希。
+- 当前 README 已明确手环 8 NFC 使用 Android 通知兼容模式；若没有私有 AAR 或正式签名材料，Release 资产应明确标为 Band 8-only 通知构建或源码发布，不能把 debug APK 冒充标准正式 APK。
+- 在整个工作区递归查找多个工具可执行文件超过命令时限，已主动终止；后续只检查已知目录或使用 `Get-Command`，不再对整个工作区做宽泛递归。
+- 已确认工作区便携 Rust 工具链可用：`work/rust-toolchain-1.97.1/bin/cargo.exe`；便携 Android 工具链和 Gradle 9.1.0 也存在。系统 PATH 没有 Cargo、NSIS 或 GitHub CLI。
+- 当前仓库只保留 Android debug APK 构建输出，Windows release target、安装器 dist、Band RPK 和正式 APK 输出均不存在；需要按发布范围重新构建或明确缺失。
+- 仓库根目录没有 `rust-toolchain.toml`；Windows 构建应继续使用此前验证过的便携 Cargo 路径与 `--target-dir`，不能依赖隐含 toolchain 配置。
+- Android `build.gradle.kts` 要求 release signing 四项配置；没有 `android-app/local.properties` 或 AAR 时只能构建 Band 8-only debug，标准 Band 10 release 不能声称可发布。
+- Windows release 构建首次失败于 `linker x86_64-w64-mingw32-clang not found`；便携 LLVM-MinGW 位于 `work/llvm-mingw-20260616-ucrt-x86_64`，下一次构建显式加入其 `bin` 到 PATH。
+- 显式加入 LLVM-MinGW 后 Windows release 构建成功；产物为 `rust-target-phone-status/release/codex_quota_windows.exe`，7,629,824 bytes，SHA-256 `63C0FB203E9D1BF2FC0105DE42253904056293DD8990443CCC03663E88E4BD90`。release 目录未自动携带 `libunwind.dll`，发布包需一并放入已核验的 DLL。
+- 当前 Android 输出为 `app-debug.apk`，包名 `com.codex.quota.android`、版本 `0.6.0 / 600`，大小 46,935,400 bytes，SHA-256 `81F561E224BA2BD2173F95C58055315CBBCA29FF81C4B482467181B25E8C5119`；需重新用 Band 8-only 参数跑测试/构建后再作为预发布资产。
+- 已整理预发布资产：`CodexQuota-0.6.0-Windows-x64-portable.zip`（包含 `CodexQuota.exe` 与 `libunwind.dll`，SHA-256 `1339CE5126DB7E358C737226D65135B0268E541862BE18159544F50274D4376A`）、`CodexQuota-0.6.0-band8-nfc-debug.apk`（SHA-256 `81F561E...C5119`）和 `SHA256SUMS.txt`；ZIP 内容已核对。
+- 发布说明必须明确这是 `v0.6.0-band8-nfc-preview` 预发布：Windows 是便携 ZIP（非 NSIS 安装器），Android 是 Band 8-only debug-signed APK；不提供 Band 10 RPK 或标准签名 APK。
+- 一次提交前复核命令误用 PowerShell 7 的 `||` 语法，当前 PowerShell 解析失败且未执行任何检查；改用兼容 PowerShell 5 的分步命令。
+- Git credential helper 使用 Windows Credential Manager；系统没有 `gh`，可在受控网络权限下通过 GitHub REST API 使用已配置的 Git 凭据创建 Release，令牌不得输出到日志。
+- Android Band 8-only wrapper 命令因 Gradle Wrapper 未命中工作区已解压的 Gradle 9.1.0，尝试联网下载且被沙箱拒绝；改用 `work/android-toolchain/gradle-runtime/gradle-9.1.0/bin/gradle.bat` 直接执行。
+- 直接 Gradle 命令在 5 分钟内没有输出且未更新 APK，已终止本次受控构建；未发现残留 Java 进程。此前已完成的 Band 8-only Android 107/107、Lint、assemble 证据仍可用于预发布说明，但本轮不把长时间无输出误报为新构建通过。

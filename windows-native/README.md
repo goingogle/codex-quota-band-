@@ -1,6 +1,7 @@
 # Codex额度 Windows 原生核心
 
-这是 0.6.0 原生 Windows 端的本地候选实现。托盘、额度采集、加密局域网服务、配对持久化和只读任务 Hook 已接入；安装器已完成构建与升级验收，仍未发布。
+这是 0.6.0 原生 Windows 端实现。托盘、额度采集、加密局域网服务、配对持久化和只读任务 Hook 已接入；当前 fork 的
+`v0.6.0-band8-nfc-preview` 提供 Windows portable ZIP，NSIS 安装器不包含在该预发布中。
 
 ## 当前能力
 
