@@ -15,6 +15,11 @@
 - NSIS Windows 安装器；
 - 正式发布签名 APK。
 
+## 手环 10 支持
+
+项目源码仍支持标准手环 10 构建：`band8Only=false` 时使用 `src/wearableSdk/java`，并要求小米官方
+`xms-wearable-lib_1.4_release.aar`、匹配的发布签名和 RPK。本预发布只针对手环 8 NFC，因此没有上传这些手环 10 资产。
+
 ## 使用边界
 
 此预发布用于当前小米手环 8 NFC 用户的功能验收。手环 8 NFC 不安装 RPK，而是通过小米运动健康转发 Android 通知。

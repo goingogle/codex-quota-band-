@@ -312,3 +312,8 @@
 - 在 escalated 用户上下文中直接从仓库工作目录读取 tag 触发 dubious ownership；从父目录调用 `origin` 又因没有仓库配置失败；最终改用远端 HTTPS URL 直接查询，确认没有现存 `v0.6.0*` tag。
 - Android Band 8-only wrapper 命令因 Gradle Wrapper 未命中工作区已解压的 Gradle 9.1.0，尝试联网下载且被沙箱拒绝；改用 `work/android-toolchain/gradle-runtime/gradle-9.1.0/bin/gradle.bat` 直接执行。
 - 直接 Gradle 命令在 5 分钟内没有输出且未更新 APK，已终止本次受控构建；未发现残留 Java 进程。此前已完成的 Band 8-only Android 107/107、Lint、assemble 证据仍可用于预发布说明，但本轮不把长时间无输出误报为新构建通过。
+- 代码核对确认手环 10 路径仍保留：标准构建在 `band8Only=false` 时要求 `android-app/app/libs/xms-wearable-lib_1.4_release.aar`，使用 `src/wearableSdk/java`；Band 8-only 才切换到安全空实现。当前预发布不包含手环 10 RPK/标准 APK，只是发布资产范围限制。
+- GitHub Release API 读取到正文中的中文已被存成 `????`，不是显示端字体问题；原因是之前通过 PowerShell 命令行内联中文提交正文时发生字符编码损失。应改为从 UTF-8 文件读取正文后 PATCH Release。
+- 首次 PATCH Release 正文使用整篇文档时被 GitHub 拒绝 `body is too long (maximum is 125000 characters)`，尽管本地文档应很短；需先检查 PowerShell 读取后的实际字符长度，避免把异常对象或编码内容提交到 API。
+- 将正文强制转换为 `[string]` 并使用 `[ordered]@{body=...}` 后，UTF-8 PATCH 成功；API 返回正文长度 933，中文已正确保存。
+- GitHub 页面通过浏览器工具读取时返回 Cache miss；以 GitHub API 真实响应为准，不把浏览器缓存失败当作 Release 内容证据。

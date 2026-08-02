@@ -67,6 +67,12 @@ Download the current files from the [`v0.6.0-band8-nfc-preview` pre-release](htt
 This is a pre-release: the Windows file is a portable ZIP rather than an NSIS installer, and the Android APK is debug-signed for
 the Band 8-only notification build. Verify `SHA256SUMS.txt` from the Release page before installing.
 
+### Is Smart Band 10 still supported?
+
+Yes, at the source/build level. The project still keeps the standard Smart Band 10 Wearable SDK/RPK path. With Xiaomi's official
+`xms-wearable-lib_1.4_release.aar`, release signing, and a matching RPK, the standard Band 10 build can be produced as described in
+the development guide. The `v0.6.0-band8-nfc-preview` intentionally does not upload a Band 10 RPK or standard signed APK.
+
 ## Installation
 
 ### 1. Run the Windows portable app

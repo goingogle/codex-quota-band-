@@ -159,3 +159,11 @@
 - 远端资产 digest、main 分支和 tag ref 已全部核对；阶段 24 完成，最终 main 为 `b19718a`，工作树干净。
 - 远端 tag 检查完成：没有现存 `v0.6.0*` 标签；检查过程中遇到 escalated 工作目录 ownership 提示，已改用远端 HTTPS URL 查询。
 - 提交前复核脚本因 PowerShell 5 不支持 `||` 而未执行；已记录并改为兼容语法重跑。
+
+## 2026-08-02：手环 10 说明与 Release 乱码修复
+
+- 代码核对确认手环 10 标准 Wearable SDK/RPK 路径仍在，当前 `v0.6.0-band8-nfc-preview` 只是不包含对应资产。
+- GitHub API 发现 Release 正文中文已变成问号；准备使用 UTF-8 文件读取后 PATCH 正文，并同步中英文 README 的支持范围说明。
+- 首次 UTF-8 PATCH 被 GitHub 以正文超过 125000 字符拒绝，尚未改变 Release；先核对本地读取长度后再用明确的短正文文件重试。
+- 已确认手环 10 标准路径仍在；README、英文 README 和 Release 说明已补充“源码支持、当前预发布不含资产”。
+- 已用 UTF-8 JSON 成功 PATCH Release 正文，API 返回中文正文正常，乱码问题已修复。

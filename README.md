@@ -61,6 +61,12 @@
 
 这是预发布版本：Windows 文件是便携 ZIP（不是 NSIS 安装器），Android APK 使用调试签名，仅建议用于本项目当前的手环 8 NFC 验收。下载后请按 Release 页面提供的 `SHA256SUMS.txt` 校验文件，不要从不明网站下载安装包。
 
+### 小米手环 10 还支持吗？
+
+支持，但当前是“源码支持、预发布不带资产”：项目仍保留手环 10 的 Wearable SDK/RPK 标准路径。按开发指南提供小米官方
+`xms-wearable-lib_1.4_release.aar`、发布签名和匹配的 RPK 后，可以构建手环 10 版本；本次 `v0.6.0-band8-nfc-preview`
+为了手环 8 NFC 轻量验收，没有上传手环 10 RPK 或标准签名 APK。
+
 ## 安装和连接
 
 ### 第一步：运行 Windows 便携版
