@@ -317,3 +317,4 @@
 - 首次 PATCH Release 正文使用整篇文档时被 GitHub 拒绝 `body is too long (maximum is 125000 characters)`，尽管本地文档应很短；需先检查 PowerShell 读取后的实际字符长度，避免把异常对象或编码内容提交到 API。
 - 将正文强制转换为 `[string]` 并使用 `[ordered]@{body=...}` 后，UTF-8 PATCH 成功；API 返回正文长度 933，中文已正确保存。
 - GitHub 页面通过浏览器工具读取时返回 Cache miss；以 GitHub API 真实响应为准，不把浏览器缓存失败当作 Release 内容证据。
+- 最终 API 核验：Release 正文长度 933，`HAS_QUESTION_MARKS=False`，包含“手环 10 支持”，仍为 `prerelease=true` 且有 3 个资产；本地与远端 `main` 已推送至最终提交 `758fd54b896a9f79f68ca81c52ff891333df0e8f`。

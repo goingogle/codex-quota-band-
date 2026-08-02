@@ -39,7 +39,7 @@
 - [complete] 阶段 23：创建 Git tag 与 GitHub Release，上传经过核验的资产
 - [complete] 阶段 24：核对远端 Release、更新发布文档并记录最终结果
 - [complete] 阶段 25：核对手环 10 保留支持并修复 GitHub Release 正文编码
-- [in_progress] 阶段 26：提交文档修复、更新远端 Release 并完成最终核验
+- [complete] 阶段 26：提交文档修复、更新远端 Release 并完成最终核验
 
 ## 完成标准
 
